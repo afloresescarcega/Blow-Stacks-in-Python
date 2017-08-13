@@ -28,6 +28,9 @@ class Stack:
 
     def size(self):
         return len(self.con)
+    
+    def peekAll(self):
+        return self.co
 
 
 
