@@ -4,13 +4,11 @@ from enum import Enum
 class Direction(Enum):
     """
     Going clockwise starting at North
-
-    Yes, I did index starting at one. Deal with it.
     """
-    NORTH = 1
-    EAST = 2
-    SOUTH = 3
-    WEST = 4
+    NORTH = 0
+    EAST = 1
+    SOUTH = 2
+    WEST = 3
 
 
 class Board:
@@ -29,6 +27,45 @@ class Board:
 
     def blow(dir):
         """
+        If there are any stacks of two, then move the tops of those pieces to 
+        new stacks IFF those new stacks are empty.
 
+        pre: dir must be of class Direction
         """
 
+
+        # make sure that dir is of type Direction
+        assert(type(dir) is Direction)
+
+        for row in len(NUM_ROWS):
+            for col in len(NUM_COLS):
+                if board[row][col].size() == 2:
+                    print("I am supposed to check to see if I can land on neighbor")
+
+    def checkNeighbor(row, col, dir):
+        """
+        Given coordinates to the stack to check with the direction for it to fall in,
+        return a boolean on whether top of stack can land in new stack position 
+        legally.
+        Illegal if:
+            * there already existed a non-empty stack.
+            * out of bounds
+
+        pre: row and col-  two ints that are both less than NUM_ROWS and NUM_COLS, 
+            aka dimesions of the board
+
+            dir - is a type of class Direction
+        post: True if stack can legally fall <dir> of coordinates given
+            False otherwise
+        """
+        # given coordinates must be in bounds of board 
+        assert(row < NUM_ROWS)
+        assrt(col < NUM_COLS)
+        # given direction must be of type class Direction
+        assert(type(dir) is Direction)
+        
+        # Depending on direction, the amount of offset is here for checking that neighbor
+        # starting from north and going clockwise
+        rowOffset = [-1, 0, 1, 0]
+        colOffset = [0, 1, 0, -1]
+        
