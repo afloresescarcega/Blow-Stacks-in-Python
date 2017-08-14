@@ -51,6 +51,34 @@ class Board:
                         # place it in the neighboring cell according to direction
                         self.board[row + rowOffset[dir]] [col + colOffset[dir]].push(piece)
 
+    def checkPlace(row, col):
+        """ 
+        Given coordinates to the stack to check to see if a full stack can be placed down.
+        i.e. is the spot empty?
+
+        return false if
+            * there already extied a non-empty stack
+            * out of bounds
+
+        return true otherwise
+        """
+        # given coordinates must be in bounds of board 
+        assert(row < NUM_ROWS)
+        assert(col < NUM_COLS)
+
+        # check to see that 'row, and col' place is not out of bounds
+        # first check row 
+        if row < 0 or row >= NUM_ROWS:
+            return False
+        # next check col
+        if col < 0 or col >= NUM_COLS:
+            return False
+
+        # check to see if there already exists a stack
+        if not self.board[row] [col].isEmpty():
+            return False # Has an item , may not place another on this stack
+        return True # There seems to be nothing illegal about the placement
+
     def checkNeighbor(row, col, dir):
         """
         Given coordinates to the stack to check with the direction for it to fall in,
@@ -67,9 +95,6 @@ class Board:
         post: True if stack can legally fall <dir> of coordinates given
             False otherwise
         """
-        # given coordinates must be in bounds of board 
-        assert(row < NUM_ROWS)
-        assrt(col < NUM_COLS)
         # given direction must be of type class Direction
         assert(type(dir) is Direction)
         
@@ -78,19 +103,7 @@ class Board:
         rowOffset = [-1, 0, 1, 0]
         colOffset = [0, 1, 0, -1]
 
-        # check to see that 'row, col and dir' neighbor is not out of bounds
-        # first check row 
-        if row + rowOffset[dir] < 0 or row + rowOffset[dir] >= NUM_ROWS:
-            return False
-        # next check col
-        if col + colOffset[dir] < 0 or col + colOffset[dir] >= NUM_COLS:
-            return False
-        
-        # check to see if there already exists a full stack
-        if not self.board[row + rowOffset[dir]] [col + colOffset[dir]].isEmpty():
-            return False # Has an item , may not place another on this stack
-
-        return True # There seems to be nothing illegal about the placement
+        return checkPlace(row + rowOffset[dir], col + colOffset[dir])
 
     def draw(self):
         """ 
