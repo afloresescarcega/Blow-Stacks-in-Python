@@ -32,6 +32,10 @@ class Board:
 
         pre: dir must be of class Direction
         """
+        # starting from north and going clockwise
+        rowOffset = [-1, 0, 1, 0]
+        colOffset = [0, 1, 0, -1]
+
 
 
         # make sure that dir is of type Direction
@@ -39,8 +43,13 @@ class Board:
 
         for row in len(NUM_ROWS):
             for col in len(NUM_COLS):
-                if board[row][col].size() == 2:
-                    print("I am supposed to check to see if I can land on neighbor")
+                if self.board[row][col].size() == 2:
+                    # Check to see if I can land on this neighbor, if true, then can land
+                    if checkNeighbor(row, col, dir):
+                        # Pop off from current stack and move it over
+                        piece = self.board[row] [col].pop()
+                        # place it in the neighboring cell according to direction
+                        self.board[row + rowOffset[dir]] [col + colOffset[dir]].push(piece)
 
     def checkNeighbor(row, col, dir):
         """
@@ -68,4 +77,53 @@ class Board:
         # starting from north and going clockwise
         rowOffset = [-1, 0, 1, 0]
         colOffset = [0, 1, 0, -1]
+
+        # check to see that 'row, col and dir' neighbor is not out of bounds
+        # first check row 
+        if row + rowOffset[dir] < 0 or row + rowOffset[dir] >= NUM_ROWS:
+            return False
+        # next check col
+        if col + colOffset[dir] < 0 or col + colOffset[dir] >= NUM_COLS:
+            return False
         
+        # check to see if there already exists a full stack
+        if not self.board[row + rowOffset[dir]] [col + colOffset[dir]].isEmpty():
+            return False # Has an item , may not place another on this stack
+
+        return True # There seems to be nothing illegal about the placement
+
+    def draw(self):
+        """ 
+        Visualizes the board by printing the contents of the cells
+
+
+        +---+
+        |B T| <-- That is a cell;    T represents the item on top B represents the item on the bottom
+        +---+
+        """
+        topAndBtm = "+---+"
+        item = "|{} {}|"
+
+        def drawAllBorder():
+            for c in range(NUM_COLS):
+                print(topAndBtm + '\n') # whole border and moves to new line
+
+        def stringBuilder(*arg):
+            return ''.join(arg)
+
+        bufferText = ""
+
+        for i in range(NUM_ROWS):
+            drawAllBorder()
+            for j in range(NUM_COLS):
+                if self.board[i] [j].isEmpty(): # if empty print an empty cell
+                    bufferText = stringBuilder(bufferText, item.format(' ', ' '))
+                else: # not empty; must peek at all the items and grab individual items
+                    contentsOfStack = self.board[i] [j].peekAll()
+                    if contentsOfStack[1] is None: # only bottom item of stack because only two items can be in this stack
+                        bufferText = stringBuilder(bufferText, item.format(contentsOfStack[0], ' '))
+                    else: # stack is full, so print both of the contents
+                        bufferText = stringBuilder(bufferText, item.format(contentsOfStack[0], contentsOfStack[1]))
+            # print a new line for the bottom border of this row
+            print('\n')
+            drawAllBorder() # end this row of cells
