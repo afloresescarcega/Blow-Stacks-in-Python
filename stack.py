@@ -30,7 +30,7 @@ class Stack:
         return len(self.con)
     
     def peekAll(self):
-        return self.co
+        return self.con # [btm, top]
 
 
 
