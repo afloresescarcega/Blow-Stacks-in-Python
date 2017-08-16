@@ -1,5 +1,7 @@
-
-
+"""
+This file solely contains template class for any type of stack
+data structure
+"""
 class Stack:
     """
 
@@ -7,9 +9,6 @@ class Stack:
 
     """
 
-    def __init__(self):
-        self.size = 0
-        self.con = []
 
     def __init__(self, con):
         self.size = 0
@@ -28,7 +27,7 @@ class Stack:
         return self.con.pop()
 
     def peek(self):
-        return self.con[self.size() - 1]
+        return self.con[self.get_size() - 1]
 
     def get_size(self):
         return len(self.con)
