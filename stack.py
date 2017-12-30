@@ -46,6 +46,8 @@ class Stack:
         """
         Return the value of the top of the stack without removing it
         """
+        if self.is_empty():
+            return None
         return self.con[self.get_size() - 1]
 
     def get_size(self):
