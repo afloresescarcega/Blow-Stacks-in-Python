@@ -14,13 +14,15 @@ BOARD_GAME = Board()
 # for testing purposes the pieces will be character 'a', 'b', 'c', 'd', and 'e'
 
 PIECES = ['a', 'b', 'c', 'd', 'e']
+# strictly for testing finding matches
+TESTING_PIECES = ['a']
 
 def rand_piece():
     """
     returns one of the five random pieces
     in PIECES
     """
-    return random.choice(PIECES)
+    return random.choice(TESTING_PIECES)
 
 WIND_DIR = {0: "North ^", 1: "East >", 2: "South V", 3: "West <"}
 
@@ -38,10 +40,11 @@ while True:
     # continue to ask the user for valid coors
     continue_asking = True  # pylint: disable=invalid-name
     while continue_asking: # loop until given valid coors
-        x_coor = int(input("Please enter a valid X coor: ")) # pylint: disable=invalid-name
-        y_coor = int(input("Please enter a valid Y coor: ")) # pylint: disable=invalid-name
+        row_coor = int(input("Please enter a valid row coor: ")) # pylint: disable=invalid-name
+        col_coor = int(input("Please enter a valid col coor: ")) # pylint: disable=invalid-name
         # if valid, do not continue asking
-        continue_asking = not BOARD_GAME.check_place(y_coor, x_coor) # pylint: disable=invalid-name
-    BOARD_GAME.place(new_stack, x_coor, y_coor)
+        continue_asking = not BOARD_GAME.check_place(col_coor, row_coor) # pylint: disable=invalid-name
+    BOARD_GAME.place(new_stack, row_coor, col_coor)
     BOARD_GAME.blow(dirxn)
     BOARD_GAME.draw()
+    BOARD_GAME.find_and_remove_matches()
