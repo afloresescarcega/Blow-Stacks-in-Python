@@ -20,6 +20,8 @@ TO-DO:
 
 from stack import Stack
 
+from my_queue import Queue
+
 
 class Board:
     """
@@ -29,6 +31,11 @@ class Board:
     # Board game sizes is in terms of number of stacks
     NUM_ROWS = 5
     NUM_COLS = 5
+
+    # starting from north and going clockwise
+    row_offset = [-1, 0, 1, 0]
+    col_offset = [0, 1, 0, -1]
+
     def __init__(self):
         # Create a 2D List of empty stack objects with NUM_ROWS and NUM_COLS dimensions
         self.board = [[Stack([]) for i in range(self.NUM_COLS)] for j in range(self.NUM_ROWS)]
@@ -59,9 +66,6 @@ class Board:
 
         pre: dir must be of class Direction
         """
-        # starting from north and going clockwise
-        row_offset = [-1, 0, 1, 0]
-        col_offset = [0, 1, 0, -1]
 
 
         for row in range(self.NUM_ROWS):
@@ -73,7 +77,76 @@ class Board:
                         # Pop off from current stack and move it over
                         piece = self.board[row][col].pop()
                         # place it in the neighboring cell according to direction
-                        self.board[row + row_offset[dirxn]][col + col_offset[dirxn]].push(piece)
+                        self.board[row + self.row_offset[dirxn]][col + self.col_offset[dirxn]].push(piece)
+
+    def find_and_remove_matches(self):
+        """
+        Finds and removes matches of three or more and then returns the 
+        scores points = 10 + 5(n - 3) where n is the number removed
+
+        Creates a 2D temp board with each cell containing information
+        of type and total sum of adjacent similar pieces
+
+        On first pass, mark with NONE the cells that do not have a 
+        single adjacent of its similar type
+
+        A cell can have 1 to 4 adjacents that are of the similar type
+
+
+        """
+        num_removed = 0
+        temp_board = [[0 for y in range(self.NUM_COLS)] for x in range(self.NUM_ROWS)]
+
+        # First pass, count the number of similar adjecent pieces around
+        for row in range(self.NUM_ROWS):
+            for col in range(self.NUM_COLS):
+                for _dir in range(4): # starting north then clockwise
+                    tgt_row = row + self.row_offset[_dir] # target row with offset
+                    tgt_col = col + self.col_offset[_dir] # target col with offset
+                    if self.in_bounds(tgt_row, tgt_col): # is this piece legal
+                        # See if adjacent piece is equal to current row and col
+                        if self.board[tgt_row][tgt_col].peek() is self.board[row][col].peek():
+                            if self.board[tgt_row][tgt_col].is_empty(): # doesn't add empty stacks
+                                pass 
+                            else:
+                                temp_board[row][col] += 1 # add 1 to the count of similar pieces to self.board[row][col]
+        # print temp_board for testing purposes
+        for row in range(self.NUM_ROWS):
+            temp_str = ""
+            for col in range(self.NUM_COLS):
+                temp_str = temp_str + str(temp_board[row][col]) + " "
+            print(temp_str + "\n")
+
+
+    def find_neighbors(self, tgt_row, tgt_col):
+        """
+        Returns a list of coordinates of the neighboring
+        cells that match the item target
+        """
+        neighbors = []
+        tgt_item = self.board[tgt_row][tgt_col].peek()
+        for direc in range(4):
+            offset_row_coor = tgt_row + self.row_offset[direc]
+            offset_col_coor = tgt_col + self.col_offset[direc]
+            item = self.board[offset_row_coor][offset_col_coor].peek()
+            if item == tgt_item: # see if neighbor, item, is same as tgt_item
+                neighbors.append([offset_row_coor, offset_col_coor])
+        return neighbors
+
+
+
+
+    def in_bounds(self, row, col):
+        """
+        check to see that 'row, and col' place is not out of bounds
+        """
+        # first check row
+        if row < 0 or row >= self.NUM_ROWS:
+            return False
+        # next check col
+        if col < 0 or col >= self.NUM_COLS:
+            return False
+        return True # Is in bounds 
 
     def check_place(self, row, col):
         """
@@ -88,11 +161,7 @@ class Board:
         """
 
         # check to see that 'row, and col' place is not out of bounds
-        # first check row
-        if row < 0 or row >= self.NUM_ROWS:
-            return False
-        # next check col
-        if col < 0 or col >= self.NUM_COLS:
+        if not self.in_bounds(row, col):
             return False
 
         # check to see if there already exists a stack
@@ -115,12 +184,8 @@ class Board:
         post: True if stack can legally fall <dirxn> of coordinates given
             False otherwise
         """
-        # Depending on dirxnection, the amount of offset is here for checking that neighbor
-        # starting from north and going clockwise
-        row_offset = [-1, 0, 1, 0]
-        col_offset = [0, 1, 0, -1]
 
-        return self.check_place(row + row_offset[dirxn], col + col_offset[dirxn])
+        return self.check_place(row + self.row_offset[dirxn], col + self.col_offset[dirxn])
 
     def draw(self):
         """
@@ -137,7 +202,7 @@ class Board:
         def draw_all_border():
             """
             prints '+---+' times the number of cols
-                specified in NUM_COLs
+                specified in NUM_COLS
             """
             line = "" # buffer string
             for _ in range(self.NUM_COLS):
